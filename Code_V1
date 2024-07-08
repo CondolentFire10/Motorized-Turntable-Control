@@ -1,0 +1,46 @@
+#include <Servo.h>
+#include <Adafruit_NeoPixel.h>
+
+const int potentiometerPin = A0; 
+const int servoPin = 15;         
+const int neoPixelPin = 14;     
+
+const int numPixels = 16;  
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(numPixels, neoPixelPin, NEO_GRB + NEO_KHZ800);
+
+Servo myServo; 
+
+void setup() {
+  myServo.attach(servoPin);  
+  pixels.begin();            
+  pixels.show();             
+}
+
+void loop() {
+  int potValue = analogRead(potentiometerPin);  // Read potentiometer value (0-1023)
+  int position = map(potValue, 0, 1023, 0, numPixels - 1);  // Map potentiometer value to 16 positions (0-15)
+
+  int angle = position * 22.5;  // Calculate the angle for the servo (0-337.5 degrees)
+
+  myServo.write(angle); 
+
+  updatePixels(position);  
+
+  delay(250);  
+}
+
+void updatePixels(int position) {
+  // Clear all pixels
+  for (int i = 0; i < numPixels; i++) {
+    pixels.setPixelColor(i, pixels.Color(255, 0, 0));  
+  }
+
+  // Set two pixels to green based on position
+  int green1 = position % numPixels;
+  int green2 = (position + numPixels / 2) % numPixels;  
+
+  pixels.setPixelColor(green1, pixels.Color(0, 255, 0)); 
+  pixels.setPixelColor(green2, pixels.Color(0, 255, 0));  
+
+  pixels.show();  
+}
